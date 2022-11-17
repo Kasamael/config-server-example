@@ -1,0 +1,52 @@
+server:
+  port: 8083
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+resilience4j:
+  bulkhead:
+    configs:
+      default:
+        event-consumer-buffer-size: 10
+        max-concurrent-calls: 200
+        max-wait-duration: 30s
+    instances:
+      producCB:
+        base-config: default
+  retry:
+    instances:
+      simple-retry:
+        base-config: default
+    configs:
+      default:
+        max-attempts: 3
+        wait-duration: 5000
+        enable-exponential-backoff: false
+        enable-randomized-wait: false
+        event-consumer-buffer-size: 10
+        retry-exception-predicate: ru.kasamael.productservice.config.RetryPredicate
+  circuitbreaker:
+    configs:
+      default:
+        register-health-indicator: true
+        sliding-window-size: 10
+        automatic-transition-from-open-to-half-open-enabled: true
+        permitted-number-of-calls-in-half-open-state: 2
+        minimum-number-of-calls: 5
+        wait-duration-in-open-state: 1m
+        failure-rate-threshold: 40 # if 4 of 10 calls fail
+        slow-call-duration-threshold: 12s
+        slow-call-rate-threshold: 70 # if 7 of 10 calls exceed 12 seconds
+        event-consumer-buffer-size: 10
+        sliding-window-type: COUNT_BASED
+        record-exceptions:
+          - org.springframework.web.client.ResourceAccessException
+        ignore-exceptions:
+          - feign.FeignException.FeignClientException
+    instances:
+      producCB:
+        base-config: default
