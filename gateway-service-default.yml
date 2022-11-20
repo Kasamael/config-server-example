@@ -6,6 +6,10 @@ spring:
     name: gateway-service
   cloud:
     gateway:
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
       routes:
         - id: product-service
           uri: http://192.168.0.103:8083/
