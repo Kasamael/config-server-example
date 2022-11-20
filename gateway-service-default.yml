@@ -19,3 +19,8 @@ spring:
           uri: http://192.168.0.103:8081/
           predicates:
             - Path=/catalog/**
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
